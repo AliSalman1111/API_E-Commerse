@@ -5,6 +5,12 @@ using API_FirstProject.Repository.IRepository;
 using API_FirstProject.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Stripe;
+using API_FirstProject.SD;
+using API_FirstProject.Serveses;
+
+
 
 namespace API_FirstProject
 {
@@ -24,6 +30,7 @@ namespace API_FirstProject
                                   });
             });
 
+         
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -34,6 +41,7 @@ namespace API_FirstProject
           
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
+
                 options.Password.RequiredLength = 3;
                 options.Password.RequireDigit = false;
                 options.Password.RequireUppercase = false;
@@ -48,6 +56,10 @@ namespace API_FirstProject
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<ICartRepository, cartRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+            builder.Services.Configure<secretkey>(builder.Configuration.GetSection("Stripe"));
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
 
             var app = builder.Build();
 
@@ -67,5 +79,7 @@ namespace API_FirstProject
 
             app.Run();
         }
+
+
     }
 }
